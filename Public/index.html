@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PromptVault</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar / Input Area -->
+        <aside class="sidebar">
+            <h2>PromptVault</h2>
+            <div class="input-group">
+                <textarea id="prompt-input" placeholder="Draft your raw prompt here..."></textarea>
+                <button id="optimize-btn" class="btn-secondary">✨ AI Optimize</button>
+                <button id="save-btn" class="btn-primary">Save to Vault</button>
+            </div>
+        </aside>
+
+        <!-- Main Display Area -->
+<main class="main-content">
+    <header class="top-bar">
+        <input type="text" id="search-bar" placeholder="Search saved prompts...">
+        <!-- Added Credits Counter -->
+        <div class="credits-box">
+            <span>⚡ Prompts Remaining:</span>
+            <span id="credit-count" class="credit-number">10</span>
+        </div>
+    </header>
+
+    <div class="prompt-grid" id="prompt-grid">
+        <!-- Hardcoded Card with Dual Buttons -->
+        <div class="prompt-card">
+            <span class="category-tag">Coding</span>
+            <h3>React Component Generator</h3>
+            <p class="prompt-text">Act as a senior frontend engineer. Generate a functional React component using Tailwind CSS...</p>
+            
+            <!-- Updated Card Actions Area -->
+            <div class="card-actions">
+                <button class="view-btn">View</button>
+                <button class="copy-btn">Copy</button>
+            </div>
+        </div>
+    </div>
+</div>
+</main>
+    
+    <script src="app.js"></script>
+</body>
+</html>
