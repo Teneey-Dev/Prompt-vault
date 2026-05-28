@@ -51,4 +51,12 @@ creditEl.textContent = prompts
 
 document.querySelector("#optimize-btn").addEventListener("click", optimizedPrompt)
 
-async
+async function savePrompt() {
+    promptInput.value 
+
+    if (promptInput === "") {
+        return alert("Input Your desired Prompts")
+    }
+
+    let 
+}
