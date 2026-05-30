@@ -24,6 +24,7 @@ let creditEl = document.querySelector("#credit-count");
 let promptEl = document.querySelector("#prompt-grid");
 let optimizeBtn = document.querySelector("#optimize-btn");
 let saveBtn = document.querySelector("#save-btn");
+let searchInput = document.querySelector("#search-input"); 
 
 // Copy Prompt Text to Clipboard
 function copyPrompt(index) {
@@ -93,6 +94,21 @@ function renderVault() {
     }
 
 renderVault();
+
+if (searchInput) {
+    searchInput.addEventListener("input", function(e) {
+        let searchTerm = e.target.value.toLowerCase().trim();
+        
+        let matches = promptsVault.filter(function(promptCard) {
+            return promptCard.title.toLowerCase().includes(searchTerm) || 
+                   promptCard.category.toLowerCase().includes(searchTerm) || 
+                   promptCard.text.toLowerCase().includes(searchTerm);
+        });
+        
+        renderVault(matches);
+    });
+}
+
 
 // Feature: AI Optimize Button Logic
 async function optimizedPrompt() {
