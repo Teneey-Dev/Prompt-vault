@@ -2,7 +2,7 @@
 // 1. GLOBAL STATE & CONFIGURATION (Always Top)
 // ==========================================
 let storeApi = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent";
-let apiKey = "AQ.Ab8RN6IQvWLfxKN6ZQfeMIrWXTXOHf5_KV3bMmdUtCB2Uq0jVQ"
+let apiKey = "AQ.Ab8RN6KzU9lfwqKDkW7oufkvZjLUEsdXiKL9oCBEj2GyShgn6g"
 
 // 💡 LOCAL STORAGE INTEGRATION: Load saved prompts or fall back to default arrays
 let defaultPrompts = [
