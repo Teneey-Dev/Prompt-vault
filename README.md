@@ -3,7 +3,7 @@
 A decentralized, optimized prompt management dashboard built for the QuikDB BuildVerse Hackathon. **PromptVault** solves the problem of "prompt clutter" by giving AI engineers and creators a centralized workstation to optimize, organize, categorize, and store their high-performing AI prompts securely in the cloud.
 
 ## 🚀 Live Demo & Deployment
-* **Live Deployment Link:** [Insert your QuikDB / Live App URL here]
+* **Live Deployment Link:** promptvault.quikdb.net
 * **Built For:** QuikDB BuildVerse Hackathon (June 2026 Submission)
 
 ---
@@ -36,4 +36,5 @@ A decentralized, optimized prompt management dashboard built for the QuikDB Buil
 ├── quikdb.json       # QuikDB cloud pipeline configuration
 └── Public/
     └── app.js        # Core frontend application & API integration logic
+```
 
