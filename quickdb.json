@@ -1,0 +1,7 @@
+{
+  "name": "promptvault",
+  "runtime": "nodejs",
+  "buildCommand": "npm install",
+  "startCommand": "node server.js",
+  "port": 3000
+}
