@@ -38,9 +38,5 @@ A decentralized, optimized prompt management dashboard built for the QuikDB Buil
     └── app.js        # Core frontend application & API integration logic
 ```
 
-## Clone the Repository
-
-git clone [https://github.com/Teneey-Dev/Prompt-vault.git](https://github.com/Teneey-Dev/Prompt-vault.git)
-cd Prompt-vault
 
     
