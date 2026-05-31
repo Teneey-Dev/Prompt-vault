@@ -1,9 +1,11 @@
-
-let prompts = 50;
+// ==========================================
+// 1. GLOBAL STATE & CONFIGURATION (Always Top)
+// ==========================================
 let storeApi = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent";
-let apiKey = "AQ.Ab8RN6IskMayv6L6ifZc7OVPDFkRQs-ydM_0y_-1hRL8kDcrRw"
+let apiKey = "AQ.Ab8RN6IQvWLfxKN6ZQfeMIrWXTXOHf5_KV3bMmdUtCB2Uq0jVQ"
 
-let promptsVault = [
+// 💡 LOCAL STORAGE INTEGRATION: Load saved prompts or fall back to default arrays
+let defaultPrompts = [
     {
         title: "Test Coding Prompt",
         category: "Coding",
@@ -16,6 +18,10 @@ let promptsVault = [
     }
 ];
 
+let promptsVault = JSON.parse(localStorage.getItem("promptsVault")) || defaultPrompts;
+let prompts= parseInt(localStorage.getItem("creditCount")) || 50;
+
+
 // ==========================================
 // 2. DOM ELEMENT SELECTION
 // ==========================================
@@ -24,29 +30,7 @@ let creditEl = document.querySelector("#credit-count");
 let promptEl = document.querySelector("#prompt-grid");
 let optimizeBtn = document.querySelector("#optimize-btn");
 let saveBtn = document.querySelector("#save-btn");
-let searchInput = document.querySelector("#search-input"); 
-
-// Copy Prompt Text to Clipboard
-function copyPrompt(index) {
-    let textToCopy = promptsVault[index].text;
-    
-    navigator.clipboard.writeText(textToCopy)
-        .then(() => {
-            alert("🚀 Prompt copied to clipboard successfully!");
-        })
-        .catch(err => {
-            console.error("Copy failed:", err);
-        });
-}
-
-// Load Selected Card Back into the Textarea Box
-function viewPrompt(index) {
-    let selectedText = promptsVault[index].text;
-    promptInput.value = selectedText;
-    
-    // Smoothly scroll mobile users back up to the text input panel
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
+let searchInput = document.querySelector("#search-input");
 
 // Initialize UI Display
 creditEl.textContent = prompts;
@@ -55,12 +39,24 @@ creditEl.textContent = prompts;
 // 3. CORE FUNCTIONS / CORE FEATURES
 // ==========================================
 
+// Helper function to update LocalStorage seamlessly across operations
+function updateLocalStorage() {
+    localStorage.setItem("promptsVault", JSON.stringify(promptsVault));
+    localStorage.setItem("creditCount", prompts);
+}
+
 // Render Vault Cards to Dashboard Grid
-function renderVault() {
+function renderVault(filteredArray = promptsVault) {
     promptEl.innerHTML = "";
     
-    for (let i = 0; i < promptsVault.length; i++) {
-        let currentPrompt = promptsVault[i];
+    if (filteredArray.length === 0) {
+        promptEl.innerHTML = `<p style="color: var(--text-secondary); grid-column: 1/-1; text-align: center; padding: 2rem;">No prompts found matching that search.</p>`;
+        return;
+    }
+
+    for (let i = 0; i < filteredArray.length; i++) {
+        let currentPrompt = filteredArray[i];
+        let originalIndex = promptsVault.indexOf(currentPrompt);
 
         promptEl.innerHTML += `
             <div class="prompt-card">
@@ -68,33 +64,18 @@ function renderVault() {
                 <h3>${currentPrompt.title}</h3>
                 <p class="prompt-text">${currentPrompt.text}</p>
                 <div class="card-actions">
-                    <button class="view-btn" onclick="viewPrompt(${i})">View</button>
-                    <button class="copy-btn" onclick="copyPrompt(${i})">Copy</button>
+                    <button class="view-btn" onclick="viewPrompt(${originalIndex})">View</button>
+                    <button class="copy-btn" onclick="copyPrompt(${originalIndex})">Copy</button>
                 </div>
             </div>
         `;
     }
 }
-    promptEl.innerHTML = "";
-    
-    for (let i = 0; i < promptsVault.length; i++) {
-        let currentPrompt = promptsVault[i];
 
-        promptEl.innerHTML += `
-            <div class="prompt-card">
-                <span class="category-tag">${currentPrompt.category}</span>
-                <h3>${currentPrompt.title}</h3>
-                <p class="prompt-text">${currentPrompt.text}</p>
-                <div class="card-actions">
-                    <button class="view-btn">View</button>
-                    <button class="copy-btn">Copy</button>
-                </div>
-            </div>
-        `;
-    }
-
+// Initial paint on load
 renderVault();
 
+// Feature: Real-Time Search Filtering
 if (searchInput) {
     searchInput.addEventListener("input", function(e) {
         let searchTerm = e.target.value.toLowerCase().trim();
@@ -109,7 +90,6 @@ if (searchInput) {
     });
 }
 
-
 // Feature: AI Optimize Button Logic
 async function optimizedPrompt() {
     if (prompts === 0) {
@@ -122,7 +102,6 @@ async function optimizedPrompt() {
         return;
     }
 
-    // Deduct credits and update UI state
     prompts--;
     creditEl.textContent = prompts;
     optimizeBtn.innerText = "Optimizing...";
@@ -135,25 +114,30 @@ async function optimizedPrompt() {
                 "x-goog-api-key": apiKey
             },
             body: JSON.stringify({
-                contents: [
-                    {
-                        parts: [
-                            { text: `You are an expert Prompt Engineer. Rewrite and optimize this user prompt to make it professional, highly detailed, clear, and structured for the best AI response. Reply with ONLY the rewritten prompt text. Do not include any introductory text, explanation, conversational chatter, or markdown formatting backticks. Just return the prompt itself.\n\nUser Prompt to optimize: "${rawText}"` }
-                        ]
-                    }
-                ]
+                contents: [{
+                    parts: [{ text: `System: You are an expert AI Prompt Engineer. Rewrite and optimize the following user prompt to make it clear, professional, and structured for maximum AI performance.\n\nUser Draft: "${rawText}"` }]
+                }]
             })
         });
 
         let data = await response.json();
-        console.log("Optimize Response Object:", data);
 
-        // Safe Guard parsing check
         if (data && data.candidates && data.candidates[0] && data.candidates[0].content) {
             let optimizedText = data.candidates[0].content.parts[0].text.trim();
             promptInput.value = optimizedText;
+            
+            // 💡 Automatically append the optimization result to your state so it updates live
+            let optimizedCard = {
+                title: "AI Optimized Prompt",
+                category: "Optimized",
+                text: optimizedText
+            };
+            
+            promptsVault.push(optimizedCard);
+            updateLocalStorage(); // Save changes permanently!
+            renderVault();
+            
         } else {
-            console.warn("Gemini payload structure was unexpected or blocked.");
             alert("The AI couldn't optimize this specific text. Please try rewriting it slightly.");
         }
         
@@ -162,7 +146,6 @@ async function optimizedPrompt() {
         alert("Failed to connect to the AI engine. Please verify your connection.");
     }
 
-    // Always reset button text
     optimizeBtn.innerText = "AI Optimize";
 }
 
@@ -191,35 +174,24 @@ async function savePrompt() {
                 "x-goog-api-key": apiKey
             },
             body: JSON.stringify({
-                contents: [
-                    {
-                        parts: [
-                            { text: `You are a text validator. Review the following snippet for quality. Is it a solid, helpful, and descriptive prompt, or is it completely weak/empty? Reply with just the single word 'Strong' or 'Weak'. Do not include any other text.\n\nSnippet to review: "${userText}"` }
-                        ]
-                    }
-                ]
+                contents: [{
+                    parts: [{ text: `You are a text validator. Review the following snippet for quality. Is it a solid, helpful, and descriptive prompt, or is it completely weak/empty? Reply with just the single word 'Strong' or 'Weak'. Do not include any other text.\n\nSnippet to review: "${userText}"` }]
+                }]
             })
         });
 
         let data = await response.json();
-        console.log("Save Response Object:", data);
-
-        // Safe Guard parsing check: defaults to Strong if Google blocks the evaluation payload
         let aiVerdict = "Strong";
+        
         if (data && data.candidates && data.candidates[0] && data.candidates[0].content) {
             aiVerdict = data.candidates[0].content.parts[0].text.trim();
-        } else {
-            console.warn("Gemini verdict layout unexpected. Defaulting to safe save.");
         }
 
         if (aiVerdict === "Weak") {
             let saveAnyway = confirm("The AI flags this prompt as weak! Click CANCEL to stop saving, and then click the 'AI Optimize' button on the sidebar to have Gemini upgrade your prompt automatically.");
-            if (!saveAnyway) {
-                return;
-            }
+            if (!saveAnyway) return;
         }
 
-        // Add verified prompt to local array
         let newPrompt = {
             text: userText,
             category: userCategory,
@@ -227,6 +199,7 @@ async function savePrompt() {
         };
         
         promptsVault.push(newPrompt);
+        updateLocalStorage(); // Save changes permanently!
         promptInput.value = "";
         renderVault();
 
@@ -234,6 +207,20 @@ async function savePrompt() {
         console.error("Save Error:", error);
         alert("Could not process the prompt verdict. Check your network.");
     }
+}
+
+// Copy Feature
+function copyPrompt(index) {
+    let textToCopy = promptsVault[index].text;
+    navigator.clipboard.writeText(textToCopy)
+        .then(() => alert("🚀 Prompt copied to clipboard successfully!"))
+        .catch(err => console.error("Copy failed:", err));
+}
+
+// View Feature
+function viewPrompt(index) {
+    promptInput.value = promptsVault[index].text;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // ==========================================
