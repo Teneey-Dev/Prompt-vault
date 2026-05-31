@@ -37,5 +37,3 @@ A decentralized, optimized prompt management dashboard built for the QuikDB Buil
 └── Public/
     └── app.js        # Core frontend application & API integration logic
 
-
-    
